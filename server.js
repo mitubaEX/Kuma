@@ -64,11 +64,11 @@ var bot = new SlackBot({
   token: token, // Add a bot https://my.slack.com/services/new/bot and put the token
   name: 'Kuma'
 });
+var params = {
+  icon_emoji: ':bear:'
+};
 
 bot.on('message', function(data) {
-  var params = {
-    icon_emoji: ':bear:'
-  };
   if(data.type == 'message' && data.username != 'Kuma') {
     // get
     if (data.text.includes('list')) {
@@ -166,6 +166,8 @@ app.get('/clear', function (req, res) {
   cloudant.db.destroy('history', function(err) {
     cloudant.db.create('history', function() {
       history = cloudant.db.use('history');
+      var now_date = new Date().getMonth() + 1
+      bot.postMessageToChannel('bots', now_date + '月になりました．お金を払ったらここにつぶやいてください', params);
     });
   });
   res.send('clear');
