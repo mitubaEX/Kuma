@@ -1,9 +1,14 @@
 var SlackBot = require('slackbots');
 var http = require('http');
 
+var fs = require('fs');
+var token;
+token = fs.readFileSync('./.env').toString().split('\n')[0];
+console.log(token);
+
 // create a bot
 var bot = new SlackBot({
-  token: 'token', // Add a bot https://my.slack.com/services/new/bot and put the token
+  token: token, // Add a bot https://my.slack.com/services/new/bot and put the token
   name: 'Kuma'
 });
 
