@@ -1,0 +1,5 @@
+---
+applications:
+ - name: coffeebear
+   random-route: true
+   memory: 256M
