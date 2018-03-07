@@ -21,7 +21,7 @@ try {
 const appEnvOpts = vcapLocal ? { vcap: vcapLocal} : {}
 
 const appEnv = cfenv.getAppEnv(appEnvOpts);
-
+var cloudant;
 if (appEnv.services['cloudantNoSQLDB'] || appEnv.getService(/cloudant/)) {
   // Load the Cloudant library.
   var Cloudant = require('cloudant');
@@ -29,10 +29,10 @@ if (appEnv.services['cloudantNoSQLDB'] || appEnv.getService(/cloudant/)) {
   // Initialize database with credentials
   if (appEnv.services['cloudantNoSQLDB']) {
     // CF service named 'cloudantNoSQLDB'
-    var cloudant = Cloudant(appEnv.services['cloudantNoSQLDB'][0].credentials);
+    cloudant = Cloudant(appEnv.services['cloudantNoSQLDB'][0].credentials);
   } else {
     // user-provided service with 'cloudant' in its name
-    var cloudant = Cloudant(appEnv.getService(/cloudant/).credentials);
+    cloudant = Cloudant(appEnv.getService(/cloudant/).credentials);
   }
 
   //database name
@@ -152,14 +152,7 @@ bot.on('message', function(data) {
 
 // Bluemix で稼働する場合はポート番号を取得
 var portno = process.env.PORT || 9080;
-// console.log("Listening on port ", portno);
 
-// http.createServer(function (req, res) {
-//   res.writeHead(200, {'Content-Type': 'text/plain'});
-//   res.write('Hello World!');
-//   res.end();
-// }).listen(portno);
-//
 var express = require('express');
 var app = express();
 
@@ -170,12 +163,15 @@ app.get('/', function (req, res) {
 
 // HTTPリクエストを受け取る部分
 app.get('/clear', function (req, res) {
+  cloudant.db.destroy('history', function(err) {
+    cloudant.db.create('history', function() {
+      history = cloudant.db.use('history');
+    });
+  });
   res.send('clear');
 });
 
 // サーバーを起動する部分
 var server = app.listen(portno, function () {
-  // var host = server.address().address;
-  // var port = server.address().port;
   console.log('started server');
 });
