@@ -137,7 +137,7 @@ bot.on('message', function(data) {
                     return console.log('[history.insert]', err.message);
                   }
                 });
-                bot.postMessageToChannel('bots', 'added payment history!', params);
+                bot.postMessageToChannel('bots', 'Added payment history!', params);
               } else {
                 bot.postMessageToChannel('bots', 'You have already paid!', params);
               }
