@@ -90,9 +90,9 @@ bot.on('message', function(data) {
               });
               filtered_names = names.filter((n) => !historys.includes(n))
               if(filtered_names.length == 0) {
-                bot.postMessageToChannel('bots', '全員支払い完了！！！', params);
+                bot.postMessageToChannel('coffee', '全員支払い完了！！！', params);
               } else {
-                bot.postMessageToChannel('bots', '未払い者: ' + filtered_names.join(','), params);
+                bot.postMessageToChannel('coffee', '未払い者: ' + filtered_names.join(','), params);
               }
             }
           });
@@ -137,9 +137,9 @@ bot.on('message', function(data) {
                     return console.log('[history.insert]', err.message);
                   }
                 });
-                bot.postMessageToChannel('bots', 'Added payment history!', params);
+                bot.postMessageToChannel('coffee', '支払履歴に追加しました！', params);
               } else {
-                bot.postMessageToChannel('bots', 'You have already paid!', params);
+                bot.postMessageToChannel('coffee', '貴方は支払い済みです！', params);
               }
             }
           });
@@ -167,7 +167,7 @@ app.get('/clear', function (req, res) {
     cloudant.db.create('history', function() {
       history = cloudant.db.use('history');
       var now_date = new Date().getMonth() + 1
-      bot.postMessageToChannel('bots', now_date + '月になりました．お金を払ったらここにつぶやいてください', params);
+      bot.postMessageToChannel('coffee', now_date + '月になりました．お金を払ったらここにつぶやいてください', params);
     });
   });
   res.send('clear');
