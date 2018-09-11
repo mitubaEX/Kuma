@@ -1,10 +1,13 @@
 var SlackBot = require('slackbots');
 var http = require('http');
-var cfenv = require("cfenv");
+var cfenv = require('cfenv');
 
 var fs = require('fs');
 var token;
-token = fs.readFileSync('./.env').toString().split('\n')[0];
+token = fs
+  .readFileSync('./.env')
+  .toString()
+  .split('\n')[0];
 console.log(token);
 
 // database
@@ -15,10 +18,10 @@ var history;
 var vcapLocal;
 try {
   vcapLocal = require('./vcap-local.json');
-  console.log("Loaded local VCAP", vcapLocal);
-} catch (e) { }
+  console.log('Loaded local VCAP', vcapLocal);
+} catch (e) {}
 
-const appEnvOpts = vcapLocal ? { vcap: vcapLocal} : {}
+const appEnvOpts = vcapLocal ? { vcap: vcapLocal } : {};
 
 const appEnv = cfenv.getAppEnv(appEnvOpts);
 var cloudant;
@@ -40,8 +43,9 @@ if (appEnv.services['cloudantNoSQLDB'] || appEnv.getService(/cloudant/)) {
 
   // Create a new "mydb" database.
   cloudant.db.create(dbName, function(err, data) {
-    if(!err) //err if database doesn't already exists
-      console.log("Created database: " + dbName);
+    if (!err)
+      //err if database doesn't already exists
+      console.log('Created database: ' + dbName);
   });
 
   // Specify the database we are going to use (mydb)...
@@ -51,8 +55,9 @@ if (appEnv.services['cloudantNoSQLDB'] || appEnv.getService(/cloudant/)) {
 
   // Create a new "mydb" database.
   cloudant.db.create(dbName, function(err, data) {
-    if(!err) //err if database doesn't already exists
-      console.log("Created database: " + dbName);
+    if (!err)
+      //err if database doesn't already exists
+      console.log('Created database: ' + dbName);
   });
 
   // Specify the database we are going to use (mydb)...
@@ -62,21 +67,21 @@ if (appEnv.services['cloudantNoSQLDB'] || appEnv.getService(/cloudant/)) {
 // create a bot
 var bot = new SlackBot({
   token: token, // Add a bot https://my.slack.com/services/new/bot and put the token
-  name: 'Kuma'
+  name: 'Kuma',
 });
 var params = {
-  icon_emoji: ':bear:'
+  icon_emoji: ':bear:',
 };
 
 bot.on('message', function(data) {
-  if(data.type == 'message' && data.username != 'Kuma') {
+  if (data.type == 'message' && data.username != 'Kuma') {
     // get
     if (data.text.includes('list')) {
       mydb.list({ include_docs: true }, function(err, body) {
         var names = [];
         if (!err) {
           body.rows.forEach(function(row) {
-            if(row.doc.name){
+            if (row.doc.name) {
               names.push(row.doc.name);
             }
           });
@@ -84,15 +89,23 @@ bot.on('message', function(data) {
             var historys = [];
             if (!err) {
               body.rows.forEach(function(row) {
-                if(row.doc.name){
+                if (row.doc.name) {
                   historys.push(row.doc.name);
                 }
               });
-              filtered_names = names.filter((n) => !historys.includes(n))
-              if(filtered_names.length == 0) {
-                bot.postMessageToChannel('coffee', '全員支払い完了！！！', params);
+              filtered_names = names.filter(n => !historys.includes(n));
+              if (filtered_names.length == 0) {
+                bot.postMessageToChannel(
+                  'coffee',
+                  '全員支払い完了！！！',
+                  params
+                );
               } else {
-                bot.postMessageToChannel('coffee', '未払い者: ' + filtered_names.join(','), params);
+                bot.postMessageToChannel(
+                  'coffee',
+                  '未払い者: ' + filtered_names.join(','),
+                  params
+                );
               }
             }
           });
@@ -104,19 +117,19 @@ bot.on('message', function(data) {
         var names = [];
         if (!err) {
           body.rows.forEach(function(row) {
-            if(row.doc.name){
+            if (row.doc.name) {
               names.push(row.doc.name);
             }
           });
           // すでに入ってるやつは入れない
           var username = '';
-          bot.getUsers()._value.members.forEach((row) => {
-            if(row.id == data.user){
+          bot.getUsers()._value.members.forEach(row => {
+            if (row.id == data.user) {
               username = row.real_name;
             }
           });
-          if(!names.includes(username)) {
-            mydb.insert({"name": username}, function(err, body, header) {
+          if (!names.includes(username)) {
+            mydb.insert({ name: username }, function(err, body, header) {
               if (err) {
                 return console.log('[mydb.insert]', err.message);
               }
@@ -127,27 +140,38 @@ bot.on('message', function(data) {
             var historys = [];
             if (!err) {
               body.rows.forEach(function(row) {
-                if(row.doc.name){
+                if (row.doc.name) {
                   historys.push(row.doc.name);
                 }
               });
-              if(!historys.includes(username)){
-                history.insert({"name": username}, function(err, body, header) {
+              if (!historys.includes(username)) {
+                history.insert({ name: username }, function(err, body, header) {
                   if (err) {
                     return console.log('[history.insert]', err.message);
                   }
                 });
-                bot.postMessageToChannel('coffee', '支払履歴に追加しました！', params);
+                bot.postMessageToChannel(
+                  'coffee',
+                  '支払履歴に追加しました！',
+                  params
+                );
               } else {
-                bot.postMessageToChannel('coffee', '貴方は支払い済みです！', params);
+                bot.postMessageToChannel(
+                  'coffee',
+                  '貴方は支払い済みです！',
+                  params
+                );
               }
             }
           });
-
         }
       });
     }
   }
+});
+
+bot.on('close', function() {
+  bot.connect();
 });
 
 // Bluemix で稼働する場合はポート番号を取得
@@ -157,23 +181,27 @@ var express = require('express');
 var app = express();
 
 // HTTPリクエストを受け取る部分
-app.get('/', function (req, res) {
+app.get('/', function(req, res) {
   res.send('Hello World!');
 });
 
 // HTTPリクエストを受け取る部分
-app.get('/clear', function (req, res) {
+app.get('/clear', function(req, res) {
   cloudant.db.destroy('history', function(err) {
     cloudant.db.create('history', function() {
       history = cloudant.db.use('history');
-      var now_date = new Date().getMonth() + 1
-      bot.postMessageToChannel('coffee', now_date + '月になりました．お金を払ったらここにつぶやいてください', params);
+      var now_date = new Date().getMonth() + 1;
+      bot.postMessageToChannel(
+        'coffee',
+        now_date + '月になりました．お金を払ったらここにつぶやいてください',
+        params
+      );
     });
   });
   res.send('clear');
 });
 
 // サーバーを起動する部分
-var server = app.listen(portno, function () {
+var server = app.listen(portno, function() {
   console.log('started server');
 });
