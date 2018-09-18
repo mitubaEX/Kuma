@@ -171,7 +171,7 @@ bot.on('message', function(data) {
 });
 
 bot.on('close', function() {
-  bot.connect();
+  bot.login();
 });
 
 // Bluemix で稼働する場合はポート番号を取得
@@ -183,6 +183,7 @@ var app = express();
 // HTTPリクエストを受け取る部分
 app.get('/', function(req, res) {
   res.send('Hello World!');
+  bot.login();
 });
 
 // HTTPリクエストを受け取る部分
