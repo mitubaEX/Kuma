@@ -183,7 +183,6 @@ var app = express();
 // HTTPリクエストを受け取る部分
 app.get('/', function(req, res) {
   res.send('Hello World!');
-  bot.login();
 });
 
 // HTTPリクエストを受け取る部分
